@@ -47,14 +47,14 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
         batch_size: the size of mini-batch             
     
     """
-	f = open("record/synthetic and academic datasets/testcases_train.pkl",'rb')  #get the testcase ids of train sets and test sets
-	testcases += pickle.load(f)  
-	f.close()
+    f = open("record/synthetic and academic datasets/testcases_train.pkl",'rb')  #get the testcase ids of train sets and test sets
+    testcases += pickle.load(f)  
+    f.close()
 
-	f = open("record/synthetic and academic datasets/testcases_test.pkl",'rb')
-	testcases += pickle.load(f)
-	f.close()
-	
+    f = open("record/synthetic and academic datasets/testcases_test.pkl",'rb')
+    testcases += pickle.load(f)
+    f.close()
+    
     print("produce train dataset...")  
     N = 6
     num = list(range(N))
