@@ -428,11 +428,11 @@ if __name__ == "__main__":
     vectorDim = 30 
     maxLen = 900 
     dropout = 0.4  
-    traindataSetPath = "./data/dl_input/train/"  
-    testdataSetPath = "./data/dl_input/test/"
+    traindataSetPath = "./data_preprocess/data/dl_input/train/"  
+    testdataSetPath = "./data_preprocess/data/dl_input/test/"
     #realtestdataSetPath = "./data/dl_input/realdata/"  
     weightPath = 'model/bgru_0.4_k=1.h5'  
     resultPath = "result/bgru_0.4_k=1.2" 
     #dealrawdata(raw_traindataSetPath, raw_testdataSetPath, traindataSetPath, testdataSetPath, batchSize, maxLen, vectorDim)
     main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, dropout=dropout)
-    #testrealdata(realtestdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)
+    testrealdata(realtestdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)

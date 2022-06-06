@@ -136,7 +136,7 @@ def cutdata(data, maxlen=MAXLEN, vector_dim=VECTOR_DIM):
 
 if __name__ == "__main__":
     
-    CORPUSPATH = "./data/NVD/corpus/"
+    CORPUSPATH = "./data/SARD/corpus/"
     VECTORPATH = "./data/vector/"
     W2VPATH = "w2v_model/wordmodel_min_iter5.model"
     

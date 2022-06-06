@@ -184,6 +184,10 @@ def getFunFromName(filename):
     idx2 = filename[0:idx1].rfind('#')
     return filename[idx2+1:idx1]
 
+def getFunFromName_juliet(filename):
+    name = filename.split('/')[-1]
+    return name.split('.')[0]
+
 def getEntryFromDict(massertFunc,mnodeInfoDict,mcallByDict):
     assertNodeId = ''
     for item in mnodeInfoDict:
@@ -235,7 +239,13 @@ if __name__ == '__main__':
 
         extractFuncBloc(slicefile,funcDict)
 
-        assertFunc = getFunFromName(slicefile)
+        # NOTE: need different function to get function name
+        #assertFunc = getFunFromName(slicefile)
+        # NOTE: this won't scale easily, as we don't have function names for every line of interest
+        assertFunc = getFunFromName_juliet(slicefile)
+        #print(assertFunc)
+        #print(nodeInfoDict)
+        #print(callByDict)
 
         entryName = getEntryFromDict(assertFunc,nodeInfoDict,callByDict)
 
@@ -248,6 +258,7 @@ if __name__ == '__main__':
         ret = sliceProduce(entryName, funcDict, assertFunc,useFuncList)
         slicefinal = ret[0]
         fileName = slicefile[:-11]+'.final.ll'
+        #print('Writing ', fileName)
         with open(fileName, 'w') as f:
             f.write(slicefinal )
             f.close()

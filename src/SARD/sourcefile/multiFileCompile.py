@@ -55,22 +55,23 @@ def autoGetVulLine(rawPathHead,fileName):
                 fileDict[testID].append(filePath[0])
                 path = ''
 
-
     for key in flawFileDict.keys():
         cmd = ''
         if flawFileDict[key].find('shared/') != -1:
             continue
-        if flawFileDict[key].find(padding(key) + os.path.split(flawFileDict[key])[1]) == -1:
-            continue
+       #if flawFileDict[key].find(padding(key) + os.path.split(flawFileDict[key])[1]) == -1:
+       #    continue
         if not os.path.exists(os.path.join(rawPathHead,flawFileDict[key])):
             print os.path.join(rawPathHead,flawFileDict[key])
             continue
         if flawFileDict[key].endswith('.c'):
             cmd = 'clang -emit-llvm -w -c -g ' + os.path.join(rawPathHead,flawFileDict[key]) + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc'
-            cmd += ' -I /home/king/aproSARD/testcaseLib/'           
+            #cmd += ' -I /home/king/aproSARD/testcaseLib/'           
+            cmd += ' -I /home/evan/repo/VulDeeLocator/src/SARD/testcaseLib/'           
         elif flawFileDict[key].endswith('.cpp'):
             cmd = 'clang++ -emit-llvm -w -c -g ' + os.path.join(rawPathHead,flawFileDict[key]) + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-4] + '.bc'
-            cmd += ' -I /home/king/aproSARD/testcaseLib/'
+            #cmd += ' -I /home/king/aproSARD/testcaseLib/'
+            cmd += ' -I /home/evan/repo/VulDeeLocator/src/SARD/testcaseLib/'           
         print cmd
         os.system(cmd)
     for key in fileDict.keys():
@@ -85,10 +86,12 @@ def autoGetVulLine(rawPathHead,fileName):
                 continue
             if noFlawFile.endswith('.c'):
                 cmd1 = 'clang -emit-llvm -w -g -c ' + os.path.join(rawPathHead,noFlawFile) + ' -o ' + os.path.join(rawPathHead,noFlawFile)[:-2] + '.bc'
-                cmd1 += ' -I /home/king/aproSARD/testcaseLib/' 
+                #cmd1 += ' -I /home/king/aproSARD/testcaseLib/' 
+                cmd1 += ' -I /home/evan/repo/VulDeeLocator/src/SARD/testcaseLib/'           
             elif noFlawFile.endswith('.cpp'):
                 cmd1 = 'clang++ -emit-llvm -w -g -c ' + os.path.join(rawPathHead,noFlawFile) + ' -o ' + os.path.join(rawPathHead,noFlawFile)[:-4] + '.bc'
-                cmd1 += ' -I /home/king/aproSARD/testcaseLib/'
+                #cmd1 += ' -I /home/king/aproSARD/testcaseLib/'
+                cmd1 += ' -I /home/evan/repo/VulDeeLocator/src/SARD/testcaseLib/'           
             if noFlawFile.find('.c') != -1 and os.path.exists(os.path.join(rawPathHead,noFlawFile)):
                 counterNoFlawFile += 1
                 os.system(cmd1)

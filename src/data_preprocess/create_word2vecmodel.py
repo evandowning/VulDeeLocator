@@ -69,7 +69,7 @@ def evaluate_w2vModel(w2vModelPath):
     
 
 def main():
-    dec_tokenFlaw_path = ['./data/corpus/']
+    dec_tokenFlaw_path = ['./data/SARD/corpus/']
 
     for iter in [3, 5, 10, 15]:
         w2v_model_path = "w2v_model/wordmodel_min_iter"+str(iter)+".model"

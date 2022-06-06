@@ -36,13 +36,24 @@ int main(int argc, char *argv[])
 			}
 			dir=(txt.substr(0,index-1));
 
+            string dirSRC;
+			dirSRC=(txt.substr(0,index-1));
+
+            //NOTE: instead of parent directory, create new directory
+            dir=txt+"_dir";
+            sprintf(cmd,"mkdir -p %s",dir.c_str());
+            system(cmd);
+
+            //TODO - debugging
+            //cout << txt << " " << dir << " " << va[k] << endl;
+
 			sprintf(cmd,"./ngetpoint %s >data-point.txt",txt.c_str());
 			system(cmd);
 			sprintf(cmd,"./nslicerline %s data-point.txt %s",txt.c_str(),va[k].c_str());
 			system(cmd);
 			sprintf(cmd,"mkdir -p %s/point",dir.c_str());
 			system(cmd);
-			sprintf(cmd,"mv data-point.txt %s/*.ll %s/point",dir.c_str(),dir.c_str());
+			sprintf(cmd,"mv data-point.txt %s/*.ll %s/point",dirSRC.c_str(),dir.c_str());
 			system(cmd);
 
 			cout << "point over"<< endl;
@@ -53,7 +64,7 @@ int main(int argc, char *argv[])
 			system(cmd);
 			sprintf(cmd,"mkdir -p %s/arr",dir.c_str());
 			system(cmd);
-			sprintf(cmd,"mv data-arr.txt %s/*.ll %s/arr",dir.c_str(),dir.c_str());
+			sprintf(cmd,"mv data-arr.txt %s/*.ll %s/arr",dirSRC.c_str(),dir.c_str());
 			system(cmd);
 
 			cout << "arr over"<< endl;
@@ -66,7 +77,7 @@ int main(int argc, char *argv[])
 			system(cmd);
 			sprintf(cmd,"mkdir -p %s/bds",dir.c_str());
 			system(cmd);
-			sprintf(cmd,"mv data-bds.txt data-val.txt %s/*.ll %s/bds",dir.c_str(),dir.c_str());
+			sprintf(cmd,"mv data-bds.txt data-val.txt %s/*.ll %s/bds",dirSRC.c_str(),dir.c_str());
 			system(cmd);
 
 			cout << "bds over"<< endl;
@@ -79,7 +90,7 @@ int main(int argc, char *argv[])
 			system(cmd);
 			sprintf(cmd,"mkdir -p %s/api",dir.c_str());
 			system(cmd);
-			sprintf(cmd,"mv data-api.txt data-val.txt %s/*.ll %s/api",dir.c_str(),dir.c_str());
+			sprintf(cmd,"mv data-api.txt data-val.txt %s/*.ll %s/api",dirSRC.c_str(),dir.c_str());
 			system(cmd);
 
 			cout << "api over"<< endl;
