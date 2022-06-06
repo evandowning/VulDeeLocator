@@ -1,0 +1,5 @@
+filepath,pred,label,tokenIndex(es)
+./data/vector/CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.cpp_dir/bds_CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.final.pkl,3.845693728743438e-12,1,[477, 527]
+./data/vector/CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.cpp_dir/point_CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.final.pkl,3.845693728743438e-12,1,[477, 527]
+./data/vector/CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.cpp_dir/api_CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.final.pkl,3.845693728743438e-12,1,[477, 527]
+./data/vector/CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.cpp_dir/arr_CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.final.pkl,3.845693728743438e-12,1,[477, 527]

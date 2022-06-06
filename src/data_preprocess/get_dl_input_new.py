@@ -32,7 +32,6 @@ def generate_corpus(model, sample):
 
     return [dl_corpus]
 
-#TODO
 def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_size=16):
     """create deeplearning model dataset
     This function is used to create train dataset and test dataset
@@ -52,8 +51,6 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
     folders_test = folders[int(len(folders)*split):]
 
     print(len(folders_train),len(folders_test))
-    #TODO - temporrary
-    folders_train = folders_test
 
     print("produce train dataset...")
     for mode in ["api", "arr", "bds", "point"]:
@@ -64,6 +61,8 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
             for folder_train in folders_train:
                 folder = os.path.join(filepath,folder_train)
                 for filename in os.listdir(folder):
+                    if mode not in filename:
+                        continue
                     path = os.path.join(folder,filename)
                     f = open(path, 'rb')
                     data = pickle.load(f)
@@ -75,7 +74,7 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
                         continue
                     for n in range(len(data)):
                         train_set[n].append(data[n])
-                train_set[-1].append(path)
+                    train_set[-1].append(path)
 
             outFN = dlTrainCorpusPath + mode + "_" + str(i) + ".pkl"
             print(outFN)
@@ -96,6 +95,8 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
             for folder_test in folders_test:
                 folder = os.path.join(filepath,folder_test)
                 for filename in os.listdir(folder):
+                    if mode not in filename:
+                        continue
                     path = os.path.join(folder,filename)
                     f = open(path, 'rb')
                     data = pickle.load(f)
@@ -107,7 +108,7 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
                         continue
                     for n in range(len(data)):
                         test_set[n].append(data[n])
-                test_set[-1].append(path)
+                    test_set[-1].append(path)
 
             outFN = dlTestCorpusPath + mode + "_" + str(i) + ".pkl"
             print(outFN)

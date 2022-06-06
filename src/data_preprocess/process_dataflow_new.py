@@ -44,95 +44,98 @@ def get_sentences(slicepath, labelpath, corpuspath):
                     f2v[k] = list()
                 f2v[k].append(int(l))
 
-    # For each program
-    for folder in os.listdir(slicepath):  
-        srcFolder = os.path.join(slicepath,folder)
-        # For each focus
-        for fourfocus in os.listdir(srcFolder):
-            fourFolder = os.path.join(srcFolder,fourfocus)
+    with open('tokenMap.txt', 'w') as fw:
+        fw.write('filepath,tokenIndex,lineNumber\n')
+        # For each program
+        for folder in os.listdir(slicepath):  
+            srcFolder = os.path.join(slicepath,folder)
+            # For each focus
+            for fourfocus in os.listdir(srcFolder):
+                fourFolder = os.path.join(srcFolder,fourfocus)
 
-            if not os.path.isdir(fourFolder):
-                continue
-
-            for filename in os.listdir(fourFolder):
-                if not filename.endswith(".final.ll"):
+                if not os.path.isdir(fourFolder):
                     continue
 
-                filepath = os.path.join(fourFolder,filename)
-                if os.path.getsize(filepath) > 1:
-                    f = open(filepath, 'r')
-                    sentences = f.read().split("\n")
-                    f.close()
-
-                    vlinenumlists = f2v[folder]
-
-                    slice_corpus = []
-                    slice_linenum = []
-                    slice_vlinenum = []
-                    slice_func = []
-                    token_index = 0
-                    linenum_index = 0
-                    funcs = []
-                    variables = []
-
-                    if sentences[0] == '\r' or sentences[0] == '':
-                        del sentences[0]
-                    if sentences == []:
+                for filename in os.listdir(fourFolder):
+                    if not filename.endswith(".final.ll"):
                         continue
-                    if sentences[-1] == '' or sentences[-1] == '\r':
-                        del sentences[-1]
 
-                    for sentence in sentences:
-                        list_tokens = create_tokens(sentence.strip()) 
+                    filepath = os.path.join(fourFolder,filename)
+                    if os.path.getsize(filepath) > 1:
+                        f = open(filepath, 'r')
+                        sentences = f.read().split("\n")
+                        f.close()
 
-                        for t_index in range(1,len(list_tokens)):
-                            if list_tokens[t_index].startswith("@"):
-                                if (list_tokens[0] == "call" and "define" in sentences[sentences.index(sentence)+1]) or (list_tokens[0] == "define" and "call" in sentences[sentences.index(sentence)-1]):
-                                    if "good" in list_tokens[t_index] or "bad" in list_tokens[t_index]:
-                                        slice_func.append(str(list_tokens[t_index]))
-                                    if list_tokens[t_index] in funcs:
-                                        list_tokens[t_index] = "func_"+str(funcs.index(list_tokens[t_index]))
-                                    else:
-                                        funcs.append(list_tokens[t_index])
-                                        list_tokens[t_index] = "func_"+str(len(funcs)-1)
-                                elif list_tokens[0] == "define" or list_tokens[0] == "store":
-                                    if "good" in list_tokens[t_index] or "bad" in list_tokens[t_index]:
-                                        slice_func.append(str(list_tokens[t_index]))
-                                    if list_tokens[t_index] in funcs:
-                                        list_tokens[t_index] = "func_"+str(funcs.index(list_tokens[t_index]))
-                                    else:
-                                        funcs.append(list_tokens[t_index])
-                                        list_tokens[t_index] = "func_"+str(len(funcs)-1)
-                                elif not "llvm" in list_tokens[t_index] and ("load" in list_tokens[:t_index] or "call" in list_tokens[:t_index]):
-                                    if list_tokens[t_index] in variables:
-                                        list_tokens[t_index] = "variable_"+str(variables.index(list_tokens[t_index]))
-                                    else:
-                                        variables.append(list_tokens[t_index])
-                                        list_tokens[t_index] = "variable_"+str(len(variables)-1)
+                        vlinenumlists = f2v[folder]
 
-                        slice_corpus = slice_corpus + list_tokens
+                        slice_corpus = []
+                        slice_linenum = []
+                        slice_vlinenum = []
+                        slice_func = []
+                        token_index = 0
+                        linenum_index = 0
+                        funcs = []
+                        variables = []
 
-                        linenum_index += 1
-                        slice_linenum.append(token_index)
-                        if linenum_index in vlinenumlists:
-                            slice_vlinenum.append(token_index)
+                        if sentences[0] == '\r' or sentences[0] == '':
+                            del sentences[0]
+                        if sentences == []:
+                            continue
+                        if sentences[-1] == '' or sentences[-1] == '\r':
+                            del sentences[-1]
 
-                        token_index = token_index + len(list_tokens)
+                        for sentence in sentences:
+                            list_tokens = create_tokens(sentence.strip()) 
 
-                    slice_func = list(set(slice_func))
-                    if slice_func == []:
-                        slice_func = ['main']
+                            for t_index in range(1,len(list_tokens)):
+                                if list_tokens[t_index].startswith("@"):
+                                    if (list_tokens[0] == "call" and "define" in sentences[sentences.index(sentence)+1]) or (list_tokens[0] == "define" and "call" in sentences[sentences.index(sentence)-1]):
+                                       #if "good" in list_tokens[t_index] or "bad" in list_tokens[t_index]:
+                                       #    slice_func.append(str(list_tokens[t_index]))
+                                        if list_tokens[t_index] in funcs:
+                                            list_tokens[t_index] = "func_"+str(funcs.index(list_tokens[t_index]))
+                                        else:
+                                            funcs.append(list_tokens[t_index])
+                                            list_tokens[t_index] = "func_"+str(len(funcs)-1)
+                                    elif list_tokens[0] == "define" or list_tokens[0] == "store":
+                                       #if "good" in list_tokens[t_index] or "bad" in list_tokens[t_index]:
+                                       #    slice_func.append(str(list_tokens[t_index]))
+                                        if list_tokens[t_index] in funcs:
+                                            list_tokens[t_index] = "func_"+str(funcs.index(list_tokens[t_index]))
+                                        else:
+                                            funcs.append(list_tokens[t_index])
+                                            list_tokens[t_index] = "func_"+str(len(funcs)-1)
+                                    elif not "llvm" in list_tokens[t_index] and ("load" in list_tokens[:t_index] or "call" in list_tokens[:t_index]):
+                                        if list_tokens[t_index] in variables:
+                                            list_tokens[t_index] = "variable_"+str(variables.index(list_tokens[t_index]))
+                                        else:
+                                            variables.append(list_tokens[t_index])
+                                            list_tokens[t_index] = "variable_"+str(len(variables)-1)
 
-                    folder_path = os.path.join(corpuspath, folder)
-                    savefilepath = os.path.join(folder_path, fourfocus+'_'+filename[:-3]+'.pkl')
-                    if not os.path.exists(folder_path):
-                        os.mkdir(folder_path)
-                        #os.chmod(folder_path, stat.S_IRWXO)
-                    f = open(savefilepath, 'wb') 
-                    pickle.dump([slice_corpus ,slice_linenum, slice_vlinenum, slice_func], f)
-                    f.close()
-                else:
-                    print('\ntoo small: ',filename)
+                            slice_corpus = slice_corpus + list_tokens
+
+                            linenum_index += 1
+                            slice_linenum.append(token_index)
+                            if linenum_index in vlinenumlists:
+                                fw.write('{0},{1},{2}\n'.format(filepath,token_index,linenum_index))
+                                slice_vlinenum.append(token_index)
+
+                            token_index = token_index + len(list_tokens)
+
+                        slice_func = list(set(slice_func))
+                        if slice_func == []:
+                            slice_func = ['main']
+
+                        folder_path = os.path.join(corpuspath, folder)
+                        savefilepath = os.path.join(folder_path, fourfocus+'_'+filename[:-3]+'.pkl')
+                        if not os.path.exists(folder_path):
+                            os.mkdir(folder_path)
+                            #os.chmod(folder_path, stat.S_IRWXO)
+                        f = open(savefilepath, 'wb') 
+                        pickle.dump([slice_corpus ,slice_linenum, slice_vlinenum, slice_func], f)
+                        f.close()
+                    else:
+                        print('\ntoo small: ',filename)
 
 if __name__ == '__main__':
     SLICEPATH = './data/SARD/data_source/'  #path of slices generated by synthetic and academic datasets

@@ -1,12 +1,16 @@
 # Parse Source files
 ```
 $ sudo apt install clang llvm libclang-dev libclang-cpp-dev
+$ sudo apt install libncurses5
 $ sudo cp -R /usr/lib/llvm-11/include/clang-c /usr/include/
 
-# I think they actually provided the binary
-#   $ wget https://github.com/mchalupa/dg/releases/download/v0.9-pre/dg_0e0fc8f9.deb
-#   $ sudo dpkg -i dg_0e0fc8f9.deb
-#   $ sudo apt install libncurses5
+# Compile dg
+$ git clone https://github.com/mchalupa/dg
+$ cd dg
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make -j4
 
 (vdl_data) $ cd src/SARD/sourcefile
 $ gcc make.cpp
@@ -27,9 +31,13 @@ python genxml.py
 (vdl) $ cd data_preprocess/
 
 $ ./preprocess.sh
+
+Map between tokenIndexes and lineNumbers is in "tokenMap.txt"
 ```
 
 # Model
 ```
 $ ./model.sh
+
+See "predictions.txt" file
 ```

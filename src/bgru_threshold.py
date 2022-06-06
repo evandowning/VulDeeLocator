@@ -140,6 +140,7 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
     linetokens = []
     vpointers = []
     funcs = []
+    testcase = []
     print("Loading data...")
     for filename in os.listdir(traindataSet_path):
         if(filename.endswith(".pkl") is False):
@@ -152,16 +153,12 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
         linetokens += linetokens_file
         vpointers += vpointers_file
         funcs += func_file
-    print(len(dataset))
-    
+        testcase += testcase_file
+    print(len(dataset),len(testcase))
+
     for vp in range(len(vpointers)):
         if vpointers[vp] != []:
             label = 1
-            for func in funcs[vp]:
-                if "good" in func:
-                    label = 0
-                    vpointers[vp] = []
-                    break
         else:
             label = 0
         labels.append(label)
@@ -169,14 +166,14 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
     train_generator = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
     all_train_samples = len(dataset)
     steps_epoch = int(all_train_samples / batch_size)
-    
+
     print("Train...")
     model.fit_generator(train_generator, steps_per_epoch=steps_epoch, epochs=4)
 
     model.save_weights(weightpath)
-    
+
     #model.load_weights(weightpath)
-    
+
     dataset = []
     linetokens = []
     vpointers = []
@@ -201,15 +198,10 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
     for vp in range(len(vpointers)):
         if vpointers[vp] != []:
             label = 1
-            for func in funcs[vp]:
-                if "good" in func:
-                    label = 0
-                    break
         else:
             label = 0
         labels.append(label)
-        
-    batch_size = 64
+
     test_generator = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
     all_test_samples = len(dataset)
     steps_epoch = int(all_test_samples / batch_size)
@@ -309,32 +301,70 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
         fwrite.write('test_dataset: ' + str(filename) + '\n')
         fwrite.write('model: ' + weightPath + '\n')
         fwrite.write('TP:' + str(TP) + ' FP:' + str(FP) + ' FN:' + str(FN) + ' TN:' + str(TN) + '\n')
-        FPR = FP / (FP + TN)
-        fwrite.write('FPR: ' + str(FPR) + '\n')
-        FNR = FN / (TP + FN)
-        fwrite.write('FNR: ' + str(FNR) + '\n')
+        if FP+TN == 0:
+            fwrite.write('FPR: n/a\n')
+        else:
+            FPR = FP / (FP + TN)
+            fwrite.write('FPR: ' + str(FPR) + '\n')
+        if TP+FN == 0:
+            fwrite.write('FNR: n/a\n')
+        else:
+            FNR = FN / (TP + FN)
+            fwrite.write('FNR: ' + str(FNR) + '\n')
         accuracy = (TP + TN) / (len(dataset))
         fwrite.write('accuracy: ' + str(accuracy) + '\n')
-        precision = TP / (TP + FP)
-        fwrite.write('precision: ' + str(precision) + '\n')
-        recall = TP / (TP + FN)
-        fwrite.write('recall: ' + str(recall) + '\n')
-        f_score = (2 * precision * recall) / (precision + recall)
-        fwrite.write('fbeta_score: ' + str(f_score) + '\n')
+        if TP+FP == 0:
+            fwrite.write('precision: n/a\n')
+            precision = 0
+        else:
+            precision = TP / (TP + FP)
+            fwrite.write('precision: ' + str(precision) + '\n')
+        if TP+FN == 0:
+            fwrite.write('recall: n/a\n')
+            recall = 0
+        else:
+            recall = TP / (TP + FN)
+            fwrite.write('recall: ' + str(recall) + '\n')
+        if precision+recall == 0:
+            fwrite.write('f_score: n/a\n')
+            f_score = 0
+        else:
+            f_score = (2 * precision * recall) / (precision + recall)
+            fwrite.write('fbeta_score: ' + str(f_score) + '\n')
 		#location
         fwrite.write('TP_l:' + str(TP_l) + ' FP_l:' + str(FP_l) + ' FN_l:' + str(FN_l) + ' TN:' + str(TN_l) + '\n')
-        FPR_l = FP_l / (FP_l + TN_l)
-        fwrite.write('FPR_location: ' + str(FPR_l) + '\n')
-        FNR_l = FN_l / (TP_l + FN_l)
-        fwrite.write('FNR_location: ' + str(FNR_l) + '\n')
-        accuracy_l = (TP_l + TN_l) / (TP_l + FP_l + FN_l + TN_l)
-        fwrite.write('accuracy_location: ' + str(accuracy_l) + '\n')
-        precision_l = TP_l / (TP_l + FP_l)
-        fwrite.write('precision_location: ' + str(precision_l) + '\n')
-        recall_l = TP_l / (TP_l + FN_l)
-        fwrite.write('recall_location: ' + str(recall_l) + '\n')
-        f_score_l = (2 * precision_l * recall_l) / (precision_l + recall_l)
-        fwrite.write('fbeta_score_location: ' + str(f_score_l) + '\n')
+        if FP_l+TN_l == 0:
+            fwrite.write('FPR location: n/a\n')
+        else:
+            FPR_l = FP_l / (FP_l + TN_l)
+            fwrite.write('FPR_location: ' + str(FPR_l) + '\n')
+        if TP_l+FN_l == 0:
+            fwrite.write('FNR location: n/a\n')
+        else:
+            FNR_l = FN_l / (TP_l + FN_l)
+            fwrite.write('FNR_location: ' + str(FNR_l) + '\n')
+        if TP_l + FP_l + FN_l + TN_l == 0:
+            fwrite.write('accuracy_location: n/a\n')
+        else:
+            accuracy_l = (TP_l + TN_l) / (TP_l + FP_l + FN_l + TN_l)
+            fwrite.write('accuracy_location: ' + str(accuracy_l) + '\n')
+        if TP_l+FP_l == 0:
+            fwrite.write('precision_location: n/a\n')
+            precision_l = 0
+        else:
+            precision_l = TP_l / (TP_l + FP_l)
+            fwrite.write('precision_location: ' + str(precision_l) + '\n')
+        if TP_l+FN_l == 0:
+            fwrite.write('recall_location: n/a\n')
+            recall_l = 0
+        else:
+            recall_l = TP_l / (TP_l + FN_l)
+            fwrite.write('recall_location: ' + str(recall_l) + '\n')
+        if precision_l+recall_l == 0:
+            fwrite.write('fbeta_score_location: n/a\n')
+        else:
+            f_score_l = (2 * precision_l * recall_l) / (precision_l + recall_l)
+            fwrite.write('fbeta_score_location: ' + str(f_score_l) + '\n')
         fwrite.write('--------------------\n')
         
     print("\nf1: ",f_score)
@@ -406,22 +436,39 @@ def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropo
     maxlen: Int type, the max length of data
     vector_dim: Int type, the number of data vector's dim
     dropout: Float type. the value of dropout
-    
     """
+
     model = build_model(maxlen, vector_dim, dropout)
     model.load_weights(weightpath)
-    
-    for filename in os.listdir(realtestpath):
-        print(filename)
-        print("Loading data...")
-        f = open(realtestpath+filename, "rb")
-        realdata = pickle.load(f, encoding="latin1")
-        f.close()
 
-        labels = model.predict(x = realdata[0],batch_size = 1)
-        for i in range(len(labels)):
-            if labels[i][0] >= 0.5:
-                print(realdata[1][i])
+    with open('predictions.txt','w') as fw:
+        fw.write('filepath,pred,label,tokenIndex(es)\n')
+
+        print("Loading data...")
+        for filename in os.listdir(realtestpath):
+            print(filename)
+            f = open(realtestpath+filename, "rb")
+            realdata = pickle.load(f, encoding="latin1")
+            f.close()
+
+            dataset, linetokens, vpointers, funcs, corpus_file, testcase = realdata
+
+            labels = []
+            for vp in range(len(vpointers)):
+                if vpointers[vp] != []:
+                    label = 1
+                else:
+                    label = 0
+                labels.append(label)
+
+            batch_size = 1
+            all_samples = len(dataset)
+            steps_epoch = int(all_samples / batch_size)
+            d = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
+
+            pred_labels = model.predict_generator(d, steps=steps_epoch)
+            for i in range(len(pred_labels)):
+                fw.write('{0},{1},{2},{3}\n'.format(testcase[i],pred_labels[i][0],labels[i],vpointers[i]))
 
 if __name__ == "__main__":
     batchSize = 64
@@ -434,5 +481,6 @@ if __name__ == "__main__":
     weightPath = 'model/bgru_0.4_k=1.h5'  
     resultPath = "result/bgru_0.4_k=1.2" 
     #dealrawdata(raw_traindataSetPath, raw_testdataSetPath, traindataSetPath, testdataSetPath, batchSize, maxLen, vectorDim)
-    main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, dropout=dropout)
-    testrealdata(realtestdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)
+#   main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, dropout=dropout)
+    #testrealdata(realtestdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)
+    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)

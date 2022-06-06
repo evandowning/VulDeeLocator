@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 				cri+=",";
 		}
 
-		sprintf(cmd,"./llvm-slicer -c %s -entry %s -annotate slicer %s.bc ",
+		sprintf(cmd,"./dg/build/tools/llvm-slicer -c %s -entry %s -annotate slicer %s.bc ",
 			cri.c_str(),holefuncname.c_str(),filename.c_str());inum++;
 		cout<<cmd<<endl;
 

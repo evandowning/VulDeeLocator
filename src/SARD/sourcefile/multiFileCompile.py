@@ -82,8 +82,8 @@ def autoGetVulLine(rawPathHead,fileName):
         fileNotExistFlag = 0
         counterNoFlawFile = 0
         for noFlawFile in fileDict[key]:
-            if not os.path.exists(os.path.join(rawPathHead,noFlawFile)) or noFlawFile.find(padding(key) + os.path.split(noFlawFile)[1]) == -1:
-                continue
+           #if not os.path.exists(os.path.join(rawPathHead,noFlawFile)) or noFlawFile.find(padding(key) + os.path.split(noFlawFile)[1]) == -1:
+           #    continue
             if noFlawFile.endswith('.c'):
                 cmd1 = 'clang -emit-llvm -w -g -c ' + os.path.join(rawPathHead,noFlawFile) + ' -o ' + os.path.join(rawPathHead,noFlawFile)[:-2] + '.bc'
                 #cmd1 += ' -I /home/king/aproSARD/testcaseLib/' 
@@ -95,6 +95,7 @@ def autoGetVulLine(rawPathHead,fileName):
             if noFlawFile.find('.c') != -1 and os.path.exists(os.path.join(rawPathHead,noFlawFile)):
                 counterNoFlawFile += 1
                 os.system(cmd1)
+                print(cmd1)
             elif not os.path.exists(os.path.join(rawPathHead,noFlawFile)):
                 fileNotExistFlag = 1
                 print key
