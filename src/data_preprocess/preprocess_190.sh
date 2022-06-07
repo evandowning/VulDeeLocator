@@ -7,7 +7,7 @@ id="190"
 
 #   time python copy_source.py /home/evan/labeled-dataset-master/CWE${id}/source_files/ ./data_${id}/SARD/data_source/
 
-time python process_dataflow_new.py ${id}
+#   time python process_dataflow_new.py ${id}
 
 rm -rf ./w2v_model_${id}
 mkdir ./w2v_model_${id}

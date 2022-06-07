@@ -9,6 +9,9 @@ time python copy_source.py /home/evan/labeled-dataset-master/CWE${id}/source_fil
 
 time python process_dataflow_new.py ${id}
 
+# NOTE - run the rest on GPU
+exit
+
 rm -rf ./w2v_model_${id}
 mkdir ./w2v_model_${id}
 time python create_word2vecmodel.py ${id}

@@ -2,12 +2,15 @@
 
 id="122"
 
-rm -rf ./data_${id}/SARD/
-mkdir -p ./data_${id}/SARD/data_source/ ./data_${id}/SARD/label_source/ ./data_${id}/SARD/corpus/
+#   rm -rf ./data_${id}/SARD/
+#   mkdir -p ./data_${id}/SARD/data_source/ ./data_${id}/SARD/label_source/ ./data_${id}/SARD/corpus/
 
-time python copy_source.py /home/evan/labeled-dataset-master/CWE${id}/source_files/ ./data_${id}/SARD/data_source/
+#   time python copy_source.py /home/evan/labeled-dataset-master/CWE${id}/source_files/ ./data_${id}/SARD/data_source/
 
 time python process_dataflow_new.py ${id}
+
+# NOTE - run the rest on GPU
+exit
 
 rm -rf ./w2v_model_${id}
 mkdir ./w2v_model_${id}
