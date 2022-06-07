@@ -24,6 +24,7 @@ import random
 import time
 import math
 import os
+import sys
 
 
 RANDOMSEED = 2018  # for reproducibility
@@ -111,7 +112,7 @@ def build_model(maxlen, vector_dim, dropout=0.4):
     return model
 
 
-def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size, maxlen, vector_dim, **kw):
+def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size, maxlen, vector_dim,idlabel, **kw):
     """Train model and test model
     
     Build the model and preprocess dataset for training, then train the model
@@ -168,7 +169,7 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
     steps_epoch = int(all_train_samples / batch_size)
 
     print("Train...")
-    model.fit_generator(train_generator, steps_per_epoch=steps_epoch, epochs=4)
+    model.fit_generator(train_generator, steps_per_epoch=steps_epoch, epochs=4, shuffle=True)
 
     model.save_weights(weightpath)
 
@@ -231,16 +232,16 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
             if y_pred == 0 and labels[index] == 0:
                 TN += 1
                 TN_l += 1
-                with open("result_analyze/TN/"+str(index)+".pkl","wb") as f:
+                with open("result_analyze_{0}/TN/".format(idlabel)+str(index)+".pkl","wb") as f:
                     pickle.dump(list([layer_output[0][j]]),f)
-                with open("result_analyze/TN_testcase_id.txt",'a+') as ftn:
+                with open("result_analyze_{0}/TN_testcase_id.txt".format(idlabel),'a+') as ftn:
                     ftn.write(testcase[index]+'\n')
             if y_pred == 0 and labels[index] == 1:
                 FN += 1
                 FN_l += 1
-                with open("result_analyze/FN/"+str(index)+".pkl","wb") as f:
+                with open("result_analyze_{0}/FN/".format(idlabel)+str(index)+".pkl","wb") as f:
                     pickle.dump(list([layer_output[0][j]]),f)
-                with open("result_analyze/FN_testcase_id.txt",'a+') as ffn:
+                with open("result_analyze_{0}/FN_testcase_id.txt".format(idlabel),'a+') as ffn:
                     ffn.write(testcase[index]+'\n')
 					
             if y_pred == 1 and labels[index] == 0:
@@ -253,9 +254,9 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
                         dict_testcase2func[testcase[index].split("/")[0]][func].append("FP")
                     else:
                         dict_testcase2func[testcase[index].split("/")[0]][func] = ["FP"]
-                with open("result_analyze/FP/"+str(index)+".pkl","wb") as f:
+                with open("result_analyze_{0}/FP/".format(idlabel)+str(index)+".pkl","wb") as f:
                     pickle.dump(list([layer_output[0][j]]),f)
-                with open("result_analyze/FP_testcase_id.txt",'a+') as ffp:
+                with open("result_analyze_{0}/FP_testcase_id.txt".format(idlabel),'a+') as ffp:
                     ffp.write(testcase[index]+'\n')					
                     
             if y_pred == 1 and labels[index] == 1:
@@ -277,9 +278,9 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
                         dict_testcase2func[testcase[index].split("/")[0]][func].append("TP")
                     else:
                         dict_testcase2func[testcase[index].split("/")[0]][func] = ["TP"]
-                with open("result_analyze/TP/"+str(index)+".pkl","wb") as f:
+                with open("result_analyze_{0}/TP/".format(idlabel)+str(index)+".pkl","wb") as f:
                     pickle.dump(list([layer_output[0][j]]),f)
-                with open("result_analyze/TP_testcase_id.txt",'a+') as ftp:
+                with open("result_analyze_{0}/TP_testcase_id.txt".format(idlabel),'a+') as ftp:
                     ftp.write(testcase[index]+'\n')
          
             results[testcase[index]] = result
@@ -292,7 +293,7 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
     with open(resultpath+"_dict_testcase2func.pkl", 'wb') as f:
         pickle.dump(dict_testcase2func, f)
         
-    with open("TP_index_BGRU.pkl", 'wb') as f:
+    with open("TP_index_BGRU_{0}.pkl".format(idlabel), 'wb') as f:
         pickle.dump(TP_index, f)
         
     with open(resultpath, 'a') as fwrite:
@@ -426,7 +427,7 @@ def sample_threshold_windows(value_sequence, linetokens, argv):
     
     return linenum
     
-def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropout):
+def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropout, fileLabel,idlabel):
     """This function is used to judge the real data(data without label) is vulnerability or not
 
     # Arguments
@@ -441,7 +442,7 @@ def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropo
     model = build_model(maxlen, vector_dim, dropout)
     model.load_weights(weightpath)
 
-    with open('predictions.txt','w') as fw:
+    with open('predictions_{0}_{1}.txt'.format(idlabel,fileLabel),'w') as fw:
         fw.write('filepath,pred,label,tokenIndex(es)\n')
 
         print("Loading data...")
@@ -471,16 +472,16 @@ def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropo
                 fw.write('{0},{1},{2},{3}\n'.format(testcase[i],pred_labels[i][0],labels[i],vpointers[i]))
 
 if __name__ == "__main__":
+    idlabel = sys.argv[1]
+
     batchSize = 64
-    vectorDim = 30 
-    maxLen = 900 
-    dropout = 0.4  
-    traindataSetPath = "./data_preprocess/data/dl_input/train/"  
-    testdataSetPath = "./data_preprocess/data/dl_input/test/"
-    #realtestdataSetPath = "./data/dl_input/realdata/"  
-    weightPath = 'model/bgru_0.4_k=1.h5'  
-    resultPath = "result/bgru_0.4_k=1.2" 
-    #dealrawdata(raw_traindataSetPath, raw_testdataSetPath, traindataSetPath, testdataSetPath, batchSize, maxLen, vectorDim)
-#   main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, dropout=dropout)
-    #testrealdata(realtestdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)
-    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout)
+    vectorDim = 30
+    maxLen = 900
+    dropout = 0.4
+    traindataSetPath = "./data_preprocess/data_{0}/dl_input/train/".format(idlabel)
+    testdataSetPath = "./data_preprocess/data_{0}/dl_input/test/".format(idlabel)
+    weightPath = 'model_{0}/bgru_0.4_k=1.h5'.format(idlabel)
+    resultPath = "result_{0}/bgru_0.4_k=1.2".format(idlabel)
+    main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, idlabel, dropout=dropout)
+    testrealdata(traindataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'train',idlabel)
+    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'test',idlabel)

@@ -6,6 +6,7 @@ from __future__ import print_function
 from gensim.models.word2vec import Word2Vec
 import numpy as np
 import pickle
+import sys
 import os
 import gc
 
@@ -141,9 +142,11 @@ def cutdata(data, maxlen=MAXLEN, vector_dim=VECTOR_DIM):
     return data
 
 if __name__ == "__main__":
-    CORPUSPATH = "./data/SARD/corpus/"
-    VECTORPATH = "./data/vector/"
-    W2VPATH = "w2v_model/wordmodel_min_iter5.model"
+    idlabel = sys.argv[1]
+
+    CORPUSPATH = "./data_{0}/SARD/corpus/".format(idlabel)
+    VECTORPATH = "./data_{0}/vector/".format(idlabel)
+    W2VPATH = "w2v_model_{0}/wordmodel_min_iter5.model".format(idlabel)
 
     print("turn the corpus into vectors...")
     model = Word2Vec.load(W2VPATH)
@@ -166,8 +169,8 @@ if __name__ == "__main__":
     print("\nw2v over...")
 
     print("spliting the train set and test set...")
-    dlTrainCorpusPath = "data/dl_input/train/"
-    dlTestCorpusPath = "data/dl_input/test/"
+    dlTrainCorpusPath = "data_{0}/dl_input/train/".format(idlabel)
+    dlTestCorpusPath = "data_{0}/dl_input/test/".format(idlabel)
     get_dldata(VECTORPATH, dlTrainCorpusPath, dlTestCorpusPath)
 
     print("\nsuccess!")

@@ -17,18 +17,20 @@ $ gcc make.cpp
 $ ./a.out
 
 
-# For testing some source files
-./test.sh
+# For testing a few source files (manually verify)
+$ ./test.sh
 
-#TODO
-# Generate xml files for source files
-python genxml.py
+
+# Extract data
+$ ./extract.sh
 
 ```
 
 # Data Preprocess
 ```
 (vdl) $ cd data_preprocess/
+
+$ ./make_map.sh > map.txt
 
 $ ./preprocess.sh
 

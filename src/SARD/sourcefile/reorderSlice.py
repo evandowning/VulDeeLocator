@@ -252,7 +252,7 @@ if __name__ == '__main__':
         #获取下方结点  nodeCoverDict包含所有子结点  funDict不包含无关函数
         filterFuncBloc(nodeRelationDict,nodeCoverDict,funcDict,assertFunc)
 
-        print('entryName',entryName)
+        #print('entryName',entryName)
 
         useFuncList.append(entryName)
         ret = sliceProduce(entryName, funcDict, assertFunc,useFuncList)

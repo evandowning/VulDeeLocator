@@ -7,6 +7,7 @@ This python file is used to tranfer the words in corpus to vector, and save the 
 from __future__ import print_function
 from gensim.models import Word2Vec
 import pickle
+import sys
 import os
 import gc
 import os
@@ -69,10 +70,11 @@ def evaluate_w2vModel(w2vModelPath):
     
 
 def main():
-    dec_tokenFlaw_path = ['./data/SARD/corpus/']
+    filelabel = sys.argv[1]
+    dec_tokenFlaw_path = ['./data_{0}/SARD/corpus/'.format(filelabel)]
 
     for iter in [3, 5, 10, 15]:
-        w2v_model_path = "w2v_model/wordmodel_min_iter"+str(iter)+".model"
+        w2v_model_path = "w2v_model_"+filelabel+"/wordmodel_min_iter"+str(iter)+".model"
         generate_w2vModel(dec_tokenFlaw_path, w2v_model_path, iter=iter)
         evaluate_w2vModel(w2v_model_path)
     

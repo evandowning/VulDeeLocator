@@ -1,0 +1,4 @@
+CWE415_Double_Free__new_delete_wchar_t_84_bad_omitgood.cpp_dir ../SARD/sourcefile/1.txt
+CWE415_Double_Free__new_delete_wchar_t_84_bad_omitbad.cpp_dir ../SARD/sourcefile/4.txt
+CWE415_Double_Free__new_delete_wchar_t_54e_omitgood.cpp_dir ../SARD/sourcefile/5.txt
+CWE415_Double_Free__new_delete_wchar_t_54e_omitbad.cpp_dir ../SARD/sourcefile/6.txt
