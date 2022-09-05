@@ -9,12 +9,12 @@ id="190"
 
 #   time python process_dataflow_new.py ${id}
 
-rm -rf ./w2v_model_${id}
-mkdir ./w2v_model_${id}
-time python create_word2vecmodel.py ${id}
+#   rm -rf ./w2v_model_${id}
+#   mkdir ./w2v_model_${id}
+#   time python create_word2vecmodel.py ${id}
 
-rm -rf ./data_${id}/vector/
-mkdir ./data_${id}/vector/
-rm -rf ./data_${id}/dl_input/
-mkdir -p ./data_${id}/dl_input/train/ ./data_${id}/dl_input/test/
+#   rm -rf ./data_${id}/vector/
+#   mkdir ./data_${id}/vector/
+#   rm -rf ./data_${id}/dl_input/
+#   mkdir -p ./data_${id}/dl_input/train/ ./data_${id}/dl_input/test/
 time python get_dl_input_new.py ${id}

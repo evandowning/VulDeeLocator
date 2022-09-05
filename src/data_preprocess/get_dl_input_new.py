@@ -156,13 +156,19 @@ if __name__ == "__main__":
             folder_path = os.path.join(VECTORPATH, testcase)
             os.mkdir(folder_path)
         for corpusfile in os.listdir(CORPUSPATH + testcase):
+            # Don't redo work
+            vector_path = os.path.join(VECTORPATH, testcase, corpusfile)
+            if os.path.exists(vector_path):
+                continue
+
             corpus_path = os.path.join(CORPUSPATH, testcase, corpusfile)
             f_corpus = open(corpus_path, 'rb')
             data = pickle.load(f_corpus)
             f_corpus.close()
+
             data.append(data[0])
             data[0] = generate_corpus(model, data[0])
-            vector_path = os.path.join(VECTORPATH, testcase, corpusfile)
+
             f_vector = open(vector_path, 'wb')
             pickle.dump(data, f_vector)
             f_vector.close()

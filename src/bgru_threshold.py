@@ -482,6 +482,12 @@ if __name__ == "__main__":
     testdataSetPath = "./data_preprocess/data_{0}/dl_input/test/".format(idlabel)
     weightPath = 'model_{0}/bgru_0.4_k=1.h5'.format(idlabel)
     resultPath = "result_{0}/bgru_0.4_k=1.2".format(idlabel)
-    main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, idlabel, dropout=dropout)
-    testrealdata(traindataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'train',idlabel)
-    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'test',idlabel)
+#   main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, idlabel, dropout=dropout)
+
+#   traindataSetPath = "./data_preprocess/data_wild/dl_input/train/"
+#   testdataSetPath = "./data_preprocess/data_wild/dl_input/test/"
+#   testrealdata(traindataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'wild_1',idlabel)
+#   testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'wild_2',idlabel)
+
+    testdataSetPath = "./data_preprocess/data_415/dl_input/test/"
+    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, '415',idlabel)

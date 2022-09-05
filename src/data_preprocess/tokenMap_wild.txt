@@ -1,0 +1,15 @@
+filepath,tokenIndex,lineNumber
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/ima_rw.c_dir/point/ima_rw_3_90:op,91:op,92:op,126:op,127:op.sliced.final.ll,1451,126
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/ima_rw.c_dir/bds/ima_rw_16_120:val,120:dp,126:val,123:dp.sliced.final.ll,1451,126
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/ima_rw.c_dir/bds/ima_rw_17_123:val,123:dp,126:val,123:dp.sliced.final.ll,1451,126
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/aiff.c_dir/point/aiff_3_273:comment,278:comment,279:comment,280:comment.sliced.final.ll,3868,279
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/adpcm.c_dir/point/adpcm_5_126:coef,127:coef.sliced.final.ll,1298,126
+./data_wild/SARD/data_source/sound_exchange-sox-14.4.2/src/adpcm.c_dir/arr/adpcm_2_126:state,127:state,154:state,157:state.sliced.final.ll,1298,126
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/point/delta_47_583:base.sliced.final.ll,7419,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/point/delta_46_557:res_dp,560:res_dp,561:res_dp,583:res_dp,584:res_dp,594:res_dp,596:res_dp_#git_delta_apply#.final.ll,11860,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/point/delta_46_557:res_dp,560:res_dp,561:res_dp,583:res_dp,584:res_dp,594:res_dp,596:res_dp.sliced.final.ll,6626,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/bds/delta_32_572:off,572:delta,583:off,607:delta.sliced.final.ll,6626,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/bds/delta_34_574:off,574:delta,583:off,607:delta.sliced.final.ll,6626,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/bds/delta_33_573:off,573:delta,583:off,607:delta.sliced.final.ll,6626,583
+./data_wild/SARD/data_source/libgit2-v0.27.2/src/delta.c_dir/api/delta_6_583:res_dp,583:base,583:off,583:len,596:res_dp,583:base,583:off,585:len.sliced.final.ll,6626,583
+./data_wild/SARD/data_source/openjpeg-v2.3.1/src/lib/openjp2/image.c_dir/point/image_5_94:image,95:image,99:image,100:image,105:image,108:image,109:image,112:image.sliced.final.ll,960,95

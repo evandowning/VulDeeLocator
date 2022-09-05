@@ -17,6 +17,10 @@ def _main():
             folders = path.replace(srcFolder,'')
             dstPath = os.path.join(dstFolder,folders)
 
+            # NOTE: Skip libtiff for now
+            if 'libtiff' in path:
+                continue
+
             ext='_dir'
             if ext == path[-len(ext):]:
                 shutil.copytree(path, dstPath)

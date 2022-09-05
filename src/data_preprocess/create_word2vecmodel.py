@@ -73,8 +73,11 @@ def main():
     filelabel = sys.argv[1]
     dec_tokenFlaw_path = ['./data_{0}/SARD/corpus/'.format(filelabel)]
 
-    for iter in [3, 5, 10, 15]:
+    #for iter in [3, 5, 10, 15]:
+    for iter in [5]:
         w2v_model_path = "w2v_model_"+filelabel+"/wordmodel_min_iter"+str(iter)+".model"
+        if os.path.exists(w2v_model_path):
+            continue
         generate_w2vModel(dec_tokenFlaw_path, w2v_model_path, iter=iter)
         evaluate_w2vModel(w2v_model_path)
     
