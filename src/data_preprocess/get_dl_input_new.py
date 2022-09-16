@@ -53,72 +53,138 @@ def get_dldata(filepath, dlTrainCorpusPath, dlTestCorpusPath, seed=2018, batch_s
 
     print(len(folders_train),len(folders_test))
 
-    print("produce train dataset...")
-    for mode in ["api", "arr", "bds", "point"]:
-        N = 1
-        num = [0]
-        for i in num:
-            train_set = [[], [], [], [], [], []]
-            for folder_train in folders_train:
-                folder = os.path.join(filepath,folder_train)
-                for filename in os.listdir(folder):
-                    if mode not in filename:
-                        continue
-                    path = os.path.join(folder,filename)
-                    f = open(path, 'rb')
-                    data = pickle.load(f)
-                    f.close()
-                    if len(data[0][0]) > MAXLEN:
-                        data[2] = [x for x in data[2] if x <= MAXLEN]
-                    data[0] = cutdata(data[0][0])
-                    if data[0] == None:
-                        continue
-                    for n in range(len(data)):
-                        train_set[n].append(data[n])
-                    train_set[-1].append(path)
+#   print("produce train dataset...")
+#   for mode in ["api", "arr", "bds", "point"]:
+#       N = 1
+#       num = [0]
+#       for i in num:
+#           train_set = [[], [], [], [], [], []]
+#           for folder_train in folders_train:
+#               folder = os.path.join(filepath,folder_train)
+#               for filename in os.listdir(folder):
+#                   if mode not in filename:
+#                       continue
+#                   path = os.path.join(folder,filename)
+#                   f = open(path, 'rb')
+#                   data = pickle.load(f)
+#                   f.close()
+#                   if len(data[0][0]) > MAXLEN:
+#                       data[2] = [x for x in data[2] if x <= MAXLEN]
+#                   data[0] = cutdata(data[0][0])
+#                   if data[0] == None:
+#                       continue
+#                   for n in range(len(data)):
+#                       train_set[n].append(data[n])
+#                   train_set[-1].append(path)
 
-            outFN = dlTrainCorpusPath + mode + "_" + str(i) + ".pkl"
-            print(outFN)
-            f_train = open(outFN, 'wb')
-            pickle.dump(train_set, f_train)
-            f_train.close()
+#           outFN = dlTrainCorpusPath + mode + "_" + str(i) + ".pkl"
+#           print(outFN)
+#           f_train = open(outFN, 'wb')
+#           pickle.dump(train_set, f_train)
+#           f_train.close()
 
-            del train_set 
-            gc.collect() 
+#           del train_set 
+#           gc.collect() 
+
+#   print("produce test dataset...")
+#   for mode in ["api", "arr", "bds", "point"]:
+#       N = 1
+#       num = [0]
+#       for i in num:
+#           test_set = [[], [], [], [], [], []]
+#           for folder_test in folders_test:
+#               folder = os.path.join(filepath,folder_test)
+#               for filename in os.listdir(folder):
+#                   if mode not in filename:
+#                       continue
+#                   path = os.path.join(folder,filename)
+#                   f = open(path, 'rb')
+#                   data = pickle.load(f)
+#                   f.close()
+#                   if len(data[0][0]) > MAXLEN:
+#                       data[2] = [x for x in data[2] if x <= MAXLEN]
+#                   data[0] = cutdata(data[0][0])
+#                   if data[0] == None:
+#                       continue
+#                   for n in range(len(data)):
+#                       test_set[n].append(data[n])
+#                   test_set[-1].append(path)
+
+#           outFN = dlTestCorpusPath + mode + "_" + str(i) + ".pkl"
+#           print(outFN)
+#           f_test = open(outFN, 'wb')
+#           pickle.dump(test_set, f_test)
+#           f_test.close()
+
+#           del test_set 
+#           gc.collect() 
 
 
-    print("produce test dataset...")
-    for mode in ["api", "arr", "bds", "point"]:
-        N = 1
-        num = [0]
-        for i in num:
-            test_set = [[], [], [], [], [], []]
-            for folder_test in folders_test:
-                folder = os.path.join(filepath,folder_test)
-                for filename in os.listdir(folder):
-                    if mode not in filename:
-                        continue
-                    path = os.path.join(folder,filename)
-                    f = open(path, 'rb')
-                    data = pickle.load(f)
-                    f.close()
-                    if len(data[0][0]) > MAXLEN:
-                        data[2] = [x for x in data[2] if x <= MAXLEN]
-                    data[0] = cutdata(data[0][0])
-                    if data[0] == None:
-                        continue
-                    for n in range(len(data)):
-                        test_set[n].append(data[n])
-                    test_set[-1].append(path)
+    count = 0
+    print("produce train dataset...")  
+    N = 6
+    num = list(range(N))
+    for i in num:
+        train_set = [[], [], [], [], [], []]
+        for folder_train in folders_train[int(i*len(folders_train)/N) : int((i+1)*len(folders_train)/N)]:
+            if not folder_train in os.listdir(filepath):
+                continue
+            sys.stdout.write('{0}\r'.format(count))
+            sys.stdout.flush()
+#           print("\r"+str(folder_train), end='')
+            for filename in os.listdir(os.path.join(filepath, folder_train)):
+                f = open(filepath + folder_train + '/' + filename, 'rb')
+                data = pickle.load(f)
+                f.close()
+                if len(data[0][0]) > MAXLEN:
+                    data[2] = [x for x in data[2] if x <= MAXLEN]
+                data[0] = cutdata(data[0][0])
+                if data[0] == None:
+                    continue        
+                for n in range(len(data)):
+                    train_set[n].append(data[n])
+                train_set[-1].append(folder_train+"/"+filename)
+            count += 1
+        f_train = open(dlTrainCorpusPath + "train_" + str(i)+ "_0818.pkl", 'wb')
+        pickle.dump(train_set, f_train)
+        f_train.close()
 
-            outFN = dlTestCorpusPath + mode + "_" + str(i) + ".pkl"
-            print(outFN)
-            f_test = open(outFN, 'wb')
-            pickle.dump(test_set, f_test)
-            f_test.close()
+        del train_set 
+        gc.collect() 
+    sys.stdout.write('\n')
 
-            del test_set 
-            gc.collect() 
+    count = 0
+    print("\nproduce test dataset...")
+    N = 6
+    num = list(range(N))
+    for i in num:
+        test_set = [[], [], [], [], [], []]
+        for folder_test in folders_test[int(i*len(folders_test)/N) : int((i+1)*len(folders_test)/N)]:
+            if not folder_test in os.listdir(filepath):
+                continue
+            sys.stdout.write('{0}\r'.format(count))
+            sys.stdout.flush()
+#           print("\r"+str(folder_test), end='')
+            for filename in os.listdir(os.path.join(filepath, folder_test)):
+                f = open(filepath + folder_test + '/' + filename, 'rb')
+                data = pickle.load(f)
+                f.close()
+                if len(data[0][0]) > MAXLEN:
+                    data[2] = [x for x in data[2] if x <= MAXLEN]
+                data[0] = cutdata(data[0][0])
+                if data[0] == None:
+                    continue        
+                for n in range(len(data)):
+                    test_set[n].append(data[n])
+                test_set[-1].append(folder_test+"/"+filename)
+            count += 1
+        f_test = open(dlTestCorpusPath + "test_" + str(i)+ "_0124.pkl", 'wb')
+        pickle.dump(test_set, f_test)
+        f_test.close()
+
+        del test_set
+        gc.collect()
+    sys.stdout.write('\n')
 
     return
 
@@ -148,10 +214,14 @@ if __name__ == "__main__":
     VECTORPATH = "./data_{0}/vector/".format(idlabel)
     W2VPATH = "w2v_model_{0}/wordmodel_min_iter5.model".format(idlabel)
 
+    count = 0
     print("turn the corpus into vectors...")
     model = Word2Vec.load(W2VPATH)
     for testcase in os.listdir(CORPUSPATH):
-        print("\r" + testcase, end='')
+        count += 1
+        sys.stdout.write('{0}\r'.format(str(count)))
+        sys.stdout.flush()
+#       print("\r" + testcase, end='')
         if testcase not in os.listdir(VECTORPATH):  
             folder_path = os.path.join(VECTORPATH, testcase)
             os.mkdir(folder_path)
@@ -172,6 +242,7 @@ if __name__ == "__main__":
             f_vector = open(vector_path, 'wb')
             pickle.dump(data, f_vector)
             f_vector.close()
+    sys.stdout.write('\n')
     print("\nw2v over...")
 
     print("spliting the train set and test set...")

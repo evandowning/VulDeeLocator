@@ -11,29 +11,36 @@ focusandfuncofslice = {}
 
 def getFlawLine(curpath, fileName):
     filePath = os.path.join(curpath, fileName)
-    if filePath.find('/shared/') != -1:
-        return
     if filePath.endswith('.final.ll'):
-    	counter = 0
+        counter = 0
         content = ''
         flawLineList = []
         focusandfuncList = []
         with open(filePath,'r') as f:
             for line in f.readlines():
-        	counter += 1
-        	line = line.encode('utf-8')
-        	if line.endswith(' #_%$$FLAW_TAG$$%_#\n'):
-        	    flawLineList.append(counter)
-        	    line = line[:-20] + '\n'
-                if line.endswith(' #_%$$KEY_FUNC$$%_#\n'):
+                counter += 1
+                line = line.encode('utf-8')
+
+                key = ' #_%$$FLAW_TAG$$%_#\n'
+                if line.endswith(key):
+                    flawLineList.append(counter)
+                    line = line[:-len(key)] + '\n'
+
+                key = ' #_%$$KEY_FUNC$$%_#\n'
+                if line.endswith(key):
                     focusandfuncList.append(counter)
-                    line = line[:-20] + '\n'
-                if line.endswith(' #_%$$FOCUS_TAG$$%_#\n'):
+                    line = line[:-len(key)] + '\n'
+
+                key = ' #_%$$FOCUS_TAG$$%_#\n'
+                if line.endswith(key):
                     focusandfuncList.append(counter)
-                    line = line[:-21] + '\n'
-        	content += line
+                    line = line[:-len(key)] + '\n'
+
+                content += line
+
         with open(filePath,'w+') as f:
-        	f.write(content)
+            f.write(content)
+
         slice2FlawDict[filePath] = flawLineList
         focusandfuncofslice[filePath] = focusandfuncList
 
@@ -62,10 +69,10 @@ if __name__ == '__main__':
         autoDetectorCodeFile(rawPath)
     slice2FlawDict.pop('test')
 
-    output = open('slice2flawline_NO.pkl', 'wb')
-    pickle.dump(slice2FlawDict, output)
-    output.close()
+#   output = open('slice2flawline_NO.pkl', 'wb')
+#   pickle.dump(slice2FlawDict, output)
+#   output.close()
 
-    output = open('funcandfocusLoc.pkl','wb')
-    pickle.dump(focusandfuncofslice,output)
-    output.close()
+#   output = open('funcandfocusLoc.pkl','wb')
+#   pickle.dump(focusandfuncofslice,output)
+#   output.close()

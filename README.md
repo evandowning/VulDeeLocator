@@ -11,7 +11,7 @@ We prepare a dataset of Lower Level Virtual Machine (LLVM) intermediate code wit
   * ```
     $ conda update conda
 
-    # For organizing dataset
+    # For organizing and parsing dataset
     $ conda create --name vdl_data python=2.7
 
     # For data preprocessing and modeling
@@ -20,40 +20,5 @@ We prepare a dataset of Lower Level Virtual Machine (LLVM) intermediate code wit
     (vdl) $ pip install -r requirements.txt
     ```
 
-## Usage
-  * Organizing datasets
-    ```
-    $ conda activate vdl_data
-
-    (vdl_data) $ ./unzip.sh
-
-    # NVD dataset
-    # NOTE: Couldn't find mentioned "process_dataflow_NVD.py" file below, so we ignore this for now.
-
-    # SARD dataset
-    (vdl_data) $ cd ./src/SARD/sourcefile
-    (vdl_data) $ cp ../../../../../data/iSeVCs/iSeVCs_for_train_programs/*.txt .
-    ```
-  * Data preprocess
-    ```
-    $ conda activate vdl
-
-    (vdl) $ cd src/data_preprocess/
-
-    # NVD
-    # TODO
-
-    # SARD
-    (vdl) $ python process_dataflow.py
-
-    (vdl) $ python create_word2vecmodel.py
-    (vdl) $ python get_dl_input.py
-    ```
-  * Train model
-    ```
-    $ conda activate vdl
-
-    (vdl) $ cd src/
-    (vdl) $ python bgru_threshold.py
-    (vdl) $ python bgru_raw.py
-    ```
+## Reproducing Results
+  * [experiments.md](src/experiments.md)

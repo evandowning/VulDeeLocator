@@ -1,8 +1,15 @@
+# Download dataset and decompress
+`labeled-dataset-master/`
+
 # Parse Source files
 ```
+# Install dependencies
 $ sudo apt install clang llvm libclang-dev libclang-cpp-dev
 $ sudo apt install libncurses5
 $ sudo cp -R /usr/lib/llvm-11/include/clang-c /usr/include/
+
+# Change directory
+$ cd src/SARD/sourcefile
 
 # Compile dg
 $ git clone https://github.com/mchalupa/dg
@@ -11,35 +18,57 @@ $ mkdir build
 $ cd build
 $ cmake ..
 $ make -j4
+$ make check
 
-(vdl_data) $ cd src/SARD/sourcefile
-$ gcc make.cpp
-$ ./a.out
+# Change environment
+$ conda activate vdl_data
 
+# Compile tools
+(vdl_data) $ gcc make.cpp
+(vdl_data) $ ./a.out
 
-# For testing a few source files (manually verify)
-$ ./test.sh
+# Test a few source files (manually verify results)
+(vdl_data) $ ./test.sh
 
+# Edit extract*.sh scripts with location of dataset
+$ vim exract_wild.sh
+$ vim exract.sh
 
-# Extract data
-$ ./extract.sh
-
+# Extract datasets
+(vdl_data) $ ./extract_wild.sh &> extract_wild_stdout_stderr.txt
+(vdl_data) $ ./extract.sh &> extract_stdout_stderr.txt
 ```
 
 # Data Preprocess
 ```
-(vdl) $ cd data_preprocess/
+# Change directory
+$ cd data_preprocess/
 
-$ ./make_map.sh > map.txt
+# Change environment
+$ conda activate vdl
 
-$ ./preprocess.sh
+# Edit make_map.sh with location of dataset
+$ vim make_map.sh
+
+# Create mapping for file paths
+(vdl) $ ./make_map.sh > map.txt
+
+# Preprocess datasets
+(vdl) $ ./preprocess.sh &> preprocess_stdout_stderr.txt
 
 Map between tokenIndexes and lineNumbers is in "tokenMap.txt"
 ```
 
 # Model
 ```
-$ ./model.sh
+# Change environment
+$ conda activate vdl
 
-See "predictions.txt" file
+# Train/Test models
+(vdl) $ ./model.sh &> model_stdout_stderr.txt
+
+See "predictions*.txt" files for results (keep in mind that the brackets are indexes, not line numbers -- see "tokenMap.txt").
+
+# Graph ROC curves
+(vdl) $ ./roc.sh
 ```

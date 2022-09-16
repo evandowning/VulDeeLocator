@@ -62,7 +62,6 @@ def get_dldata(filepath, folders, dlTrainCorpusPath, dlTestCorpusPath, seed=2018
                     if mode not in filename:
                         continue
                     path = os.path.join(folder,filename)
-                    print(path)
                     f = open(path, 'rb')
                     data = pickle.load(f)
                     f.close()
@@ -97,7 +96,6 @@ def get_dldata(filepath, folders, dlTrainCorpusPath, dlTestCorpusPath, seed=2018
                     if mode not in filename:
                         continue
                     path = os.path.join(folder,filename)
-                    print(path)
                     f = open(path, 'rb')
                     data = pickle.load(f)
                     f.close()

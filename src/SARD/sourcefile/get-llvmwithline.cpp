@@ -39,13 +39,13 @@ int main(int argc, char *argv[])
             string dirSRC;
 			dirSRC=(txt.substr(0,index-1));
 
-            //NOTE: instead of parent directory, create new directory
-            dir=txt+"_dir";
-            sprintf(cmd,"mkdir -p %s",dir.c_str());
-            system(cmd);
+			//NOTE: instead of parent directory, create new directory
+			dir=txt+"_dir";
+			sprintf(cmd,"mkdir -p %s",dir.c_str());
+			system(cmd);
 
-            //TODO - debugging
-            //cout << txt << " " << dir << " " << va[k] << endl;
+			// NOTE: debugging
+			//cout << txt << " " << dir << " " << va[k] << endl;
 
 			sprintf(cmd,"./ngetpoint %s >data-point.txt",txt.c_str());
 			system(cmd);

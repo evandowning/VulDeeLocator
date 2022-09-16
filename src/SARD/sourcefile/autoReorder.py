@@ -7,116 +7,103 @@ import re
 def reorder(targetPath, fileName, flag, labelFile):
     if not os.path.exists(targetPath):
         return
-    flawLineDict = {} #key:xxx_new.ll value:linenum of vulline
-    focusLineDict = {} #key:xxx_new.ll value:linenum of focus
-    dirList = os.listdir(targetPath) 
-    flagZero = 0
-    linenum = 0
-    for targetfile in dirList:  
-    	flagZero = 0
-        #NOTE: this doesn't apply to our wild dataset
-       #if not targetfile.endswith('].ll') or targetfile.endswith('[9999].ll'):
-       #    continue
-        if targetfile.endswith('_[0].ll'):
-            flagZero = 1
-        elif targetfile.endswith('.ll'):
-            flagZero = 2
-        else:
-            continue
-        if flagZero == 0:
-            targetflag = re.findall('_\[(\d+)_(\d+)\].ll', targetfile) 
-            sliceName = re.sub('_\[\d+_\d+\].ll', '.new.ll', targetfile) #change [xxx_yy].ll to new.ll
-            linenum = re.findall('_(\d+):',targetfile)[0];
-        elif flagZero == 1:
-            sliceName = targetfile[:-7] + '.new.ll' #change [0].ll to new.ll
-            linenum = re.findall('_(\d+):',targetfile)[0];
-        #NOTE - need a new.ll file for Juliet dataset
-        elif flagZero == 2:
-            sliceName = targetfile[:-3] + '.new.ll' #change [0].ll to new.ll
-            # Flaw lines are in the file
-            linenum = list()
-            with open(labelFile,'r') as fr:
-                for line in fr:
-                    line = line.strip('\n')
-                    _,l = line.split(' ')
-                    linenum.append(int(l))
-        focusLineDict[sliceName] = linenum
-        os.system('cp -f \"' + os.path.join(targetPath, targetfile) + '\" \"' + os.path.join(targetPath, sliceName)+ '\"') 
-        if flagZero == 0 and sliceName in flawLineDict:
-            for i in range(int(targetflag[0][1])): 
-                flawLineDict[sliceName].append(int(targetflag[0][0]) + i)
-        elif flagZero == 0:
-            flawLineDict[sliceName] = []
-            for i in range(int(targetflag[0][1])):
-                flawLineDict[sliceName].append(int(targetflag[0][0]) + i)
-        elif sliceName in flawLineDict:
-            flawLineDict[sliceName].append(0)
-        # NOTE: needed for Juliet dataset
-        elif flagZero == 2:
-            if sliceName not in flawLineDict.keys():
-                flawLineDict[sliceName] = list()
-            for l in linenum:
-                flawLineDict[sliceName].append(l)
-        else:
-            flawLineDict[sliceName] = [0]
 
-    for slicefile in flawLineDict.keys():
-        lineCounter = 0
-        sliceStr = ''
-        sourcelinedbg = []
-        lines = focusLineDict[slicefile]
+    # Get lines we're interested in (vulnerabilities)
+    linenum = list()
+    with open(labelFile,'r') as fr:
+        for line in fr:
+            line = line.strip('\n')
+            _,l = line.split(' ')
+            linenum.append(int(l))
 
-#       print(flawLineDict[slicefile])
+    flawLineDict = {}
+    focusLineDict = {}
 
-        # For each vulnerable line
-        for linenum in lines:
-#           print(linenum)
+    targetfile = targetPath.split('/')[-2]
+    targetfile = targetfile.split('.')[0]
+    targetfile += '.ll'
+    targetFN = os.path.join(targetPath,targetfile)
 
-            with open(os.path.join(targetPath,slicefile),'r') as f:
-                for line in f:
-                    if(line.startswith('!')):
-                        pattern = '(.*) = !DILocation\(line: '+str(linenum)
-                        dbg = re.findall(pattern,line)
-                        if(len(dbg)):
-                            sourcelinedbg.append(dbg[0])
+    sliceName = targetfile[:-3] + '.new.ll' # change to new.ll
+    sliceFN = os.path.join(targetPath,sliceName)
 
-#           print(sourcelinedbg)
+    # If '.new.ll' already exists, we've already parsed this folder
+    if os.path.exists(sliceFN):
+        return
 
-            with open(os.path.join(targetPath,slicefile),'r') as f:
-                for line in f:
-                    lineCounter += 1
-                    noteFlag = re.findall('\A +; x',line)
-                    if noteFlag: 
-                        continue
-                    for dbgline in sourcelinedbg:
-                       if line.endswith(dbgline+'\n'):
-                           line = line.replace('\n','')
-                           line += ' #_%$$FOCUS_TAG$$%_#\n' 
-                    if lineCounter in flawLineDict[slicefile]:
-                        line = line.replace('\n','')
-                        line += ' #_%$$FLAW_TAG$$%_#\n'
-                    sliceStr += line
+    focusLineDict[sliceName] = linenum
+    if len(linenum) == 0:
+        flawLineDict[sliceName] = [0]
+    else:
+        flawLineDict[sliceName] = linenum
+    os.system('cp -f \"' + targetFN + '\" \"' + sliceFN + '\"') 
 
-#       if 'FOCUS_TAG' in sliceStr:
-#           print('YAY focus')
-#       if 'FLAW_TAG' in sliceStr:
-#           print('YAY flaw')
+    lineCounter = 0
+    sliceStr = ''
+    sourcelinedbg = []
 
-        if(len(slicefile[:-7] + '.flawtag.ll') > 250): 
-            return
-        with open(os.path.join(targetPath,slicefile[:-7] + '.flawtag.ll'),'w') as f: 
-            f.write(sliceStr)
+    # For each vulnerable line
+    for number in linenum:
+        with open(sliceFN,'r') as f:
+            for line in f:
+                if(line.startswith('!')):
+                    pattern = '(.*) = !DILocation\(line: '+str(number)
+                    dbg = re.findall(pattern,line)
+                    if(len(dbg)):
+                        sourcelinedbg.append(dbg[0])
+
+        with open(sliceFN,'r') as f:
+            for line in f:
+                lineCounter += 1
+                noteFlag = re.findall('\A +; x',line)
+                if noteFlag:
+                    continue
+                for dbgline in sourcelinedbg:
+                   if line.endswith(dbgline+'\n'):
+                       line = line.replace('\n','')
+#                      line += ' #_%$$FOCUS_TAG$$%_#\n'
+                       line += ' #_%$$FOCUS_TAG$$%_# #_%$$FLAW_TAG$$%_#\n'
+#               if lineCounter in flawLineDict[sliceName]:
+#                   line = line.replace('\n','')
+#                   line += ' #_%$$FLAW_TAG$$%_#\n'
+                sliceStr += line
+
+#   if 'FOCUS_TAG' in sliceStr:
+#       print('YAY focus')
+#   if 'FLAW_TAG' in sliceStr:
+#       print('YAY flaw')
+
+    flawFN = os.path.join(targetPath,targetfile[:-3] + '.flawtag.ll')
+    with open(flawFN,'w') as f:
+        f.write(sliceStr)
 
     dirList = os.listdir(targetPath)
     for targetfile in dirList:
-    	if fileName == 'multiFinal':
-    	    flagMulti = 0
-    	elif targetfile.find(fileName) == -1: 
-    		flagMulti = 1
-    	else:
-    		flagMulti = 0
+        if fileName == 'multiFinal':
+            flagMulti = 0
+        elif targetfile.find(fileName) == -1: 
+            flagMulti = 1
+        else:
+            flagMulti = 0
+
         if not targetfile.endswith('.flawtag.ll') or flagMulti == 1:
             continue
+
+#       # Note if we've found the lines with the flaws on them
+#       found = False
+#       for l in linenum:
+#           if '{0}:'.format(l) in targetfile:
+#               found = True
+#               break
+#       # If no flaw was found
+#       if found is False:
+#           print('No Flaw: ',fileName,targetPath,targetfile)
+#       # If flaw was found
+#       else:
+#           print('Flaw: ',fileName,targetPath,targetfile,linenum)
+
+        # Create '.final.ll' file
+        # Reorder slices for .c or .cpp file
         if flag == 0:
             cmd = 'python2 reorderSlice.py ' + fileName + '.c "' + os.path.join(targetPath, targetfile) + '"'
             os.system(cmd)
@@ -124,12 +111,11 @@ def reorder(targetPath, fileName, flag, labelFile):
             cmd = 'python2 reorderSlice.py ' + fileName + '.cpp "' + os.path.join(targetPath, targetfile) + '"'
             os.system(cmd)
 
-        #TODO
         # If *.final.ll has nothing in it (e.g., if there is no calling function), just copy over contents
         finalName = targetfile.replace('.flawtag.','.final.')
         finalFN = os.path.join(targetPath,finalName)
         targetFN = os.path.join(targetPath,targetfile)
-        if os.path.getsize(finalFN) == 0:
+        if (os.path.exists(finalFN)) and (os.path.getsize(finalFN) == 0):
             cmd = 'cp {0} {1}'.format(targetFN,finalFN)
             os.system(cmd)
 
@@ -143,13 +129,10 @@ def codeCompile(curpath, fileName, labelFile):
             '/point/') == -1 and filePath.find('/bds/') == -1:
         flag = 1 
     if filePath.endswith('.bc') and fileName != 'multiFinal.bc' and flag == 1:
-        #NOTE: need to specify to output dot file locally
-        cmd = 'opt -dot-callgraph "' + filePath + '"'
+        cmd = 'opt -dot-callgraph "' + filePath + '" -o /dev/null'
         os.system(cmd)
-        #print(cmd)
         cmd = 'cp {0}.callgraph.dot callgraph.dot'.format(filePath)
         os.system(cmd)
-        #print(cmd)
         if os.path.isfile(os.path.join(curpath, fileName[:-3] + '.c')):
             flag = 0
         else:
@@ -158,10 +141,8 @@ def codeCompile(curpath, fileName, labelFile):
         reorder(os.path.join(curpath, 'arr'), fileName[:-3], flag, labelFile);
         reorder(os.path.join(curpath, 'point'), fileName[:-3], flag, labelFile);
         reorder(os.path.join(curpath, 'bds'), fileName[:-3], flag, labelFile);
-        #cmd = 'mv callgraph.dot '+curpath+'/'+fileName[:-3]+'_callgraph.dot'
         cmd = 'rm callgraph.dot'
         os.system(cmd)
-        #print(cmd)
 
 
 def autoDetectorCodeFile(curPath,labelFile):
@@ -180,7 +161,6 @@ def autoDetectorCodeFile(curPath,labelFile):
 
 
 if __name__ == '__main__':
-
     parser = OptionParser()
     (options, args) = parser.parse_args()
     if len(args) > 2:

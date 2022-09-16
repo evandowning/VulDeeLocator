@@ -195,7 +195,7 @@ def getEntryFromDict(massertFunc,mnodeInfoDict,mcallByDict):
             assertNodeId = item
     keyset = set(mcallByDict.keys())
     tmpfun = assertNodeId
-    for i in range(1): 
+    for i in range(1):
         if tmpfun in keyset and len(mcallByDict[tmpfun])>0:
             for fatherfun in mcallByDict[tmpfun]:
                 if fatherfun != tmpfun and mnodeInfoDict[fatherfun] in funcList:

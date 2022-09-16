@@ -17,7 +17,7 @@ def autoGetVulLine(rawPathHead,fileName):
     with open(fileName) as f:
         fileFlag = 0
         path = ''
-        print fileName
+        #print fileName
         testID = 0
         flawLineList = set([])
         for line in f.readlines():
@@ -62,7 +62,7 @@ def autoGetVulLine(rawPathHead,fileName):
        #if flawFileDict[key].find(padding(key) + os.path.split(flawFileDict[key])[1]) == -1:
        #    continue
         if not os.path.exists(os.path.join(rawPathHead,flawFileDict[key])):
-            print os.path.join(rawPathHead,flawFileDict[key])
+            #print os.path.join(rawPathHead,flawFileDict[key])
             continue
         if flawFileDict[key].endswith('.c'):
             cmd = 'clang -emit-llvm -w -c -g ' + os.path.join(rawPathHead,flawFileDict[key]) + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc'
@@ -95,10 +95,10 @@ def autoGetVulLine(rawPathHead,fileName):
             if noFlawFile.find('.c') != -1 and os.path.exists(os.path.join(rawPathHead,noFlawFile)):
                 counterNoFlawFile += 1
                 os.system(cmd1)
-                print(cmd1)
+                #print(cmd1)
             elif not os.path.exists(os.path.join(rawPathHead,noFlawFile)):
                 fileNotExistFlag = 1
-                print key
+                #print key
                 break
             if noFlawFile.endswith('.c') and noFlawFile.find(padding(key) + os.path.split(noFlawFile)[1]) != -1:
                 cmd += ' ' + os.path.join(rawPathHead,noFlawFile)[:-2] + '.bc'
@@ -109,7 +109,7 @@ def autoGetVulLine(rawPathHead,fileName):
         if key in flawFileDict.keys():
             if flawFileDict[key].endswith('.c'):
                 cmd += ' ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc'
-                print cmd + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc'
+                #print cmd + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc'
                 result = os.system(cmd + ' -o ' + os.path.join(rawPathHead,flawFileDict[key])[:-2] + '.bc')
             elif flawFileDict[key].endswith('.cpp'):
                 cmd += ' ' + os.path.join(rawPathHead,flawFileDict[key])[:-4] + '.bc'

@@ -164,14 +164,19 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
             label = 0
         labels.append(label)
 
+    print(Counter(labels))
+
     train_generator = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
     all_train_samples = len(dataset)
     steps_epoch = int(all_train_samples / batch_size)
 
     print("Train...")
-    model.fit_generator(train_generator, steps_per_epoch=steps_epoch, epochs=4, shuffle=True)
+    model.fit_generator(train_generator, steps_per_epoch=steps_epoch, epochs=10, shuffle=True)
 
     model.save_weights(weightpath)
+
+    # NOTE: Just train model. We'll output testing results in a different function.
+    return
 
     #model.load_weights(weightpath)
 
@@ -224,7 +229,7 @@ def main(traindataSet_path, testdataSet_path, weightpath, resultpath, batch_size
 
             result = sample_threshold_windows(layer_output[0][j], linetokens[index], {'threshold_value':0.5, 'k':1})#result是漏洞行的行号
         
-            if result:
+            if len(result) > 0:
                 y_pred = 1
             else:
                 y_pred = 0
@@ -422,8 +427,9 @@ def sample_threshold_windows(value_sequence, linetokens, argv):
         window = [x[0] for x in window]
         window.sort(reverse = True)
         k_max = window[:k]
-        if sum(k_max)/ len(k_max) > threshold_value:
-            linenum.append(i)
+        score = sum(k_max)/len(k_max)
+        if score > threshold_value:
+            linenum.append((i,score))
     
     return linenum
     
@@ -442,34 +448,60 @@ def testrealdata(realtestpath, weightpath, batch_size, maxlen, vector_dim, dropo
     model = build_model(maxlen, vector_dim, dropout)
     model.load_weights(weightpath)
 
+    dataset = []
+    linetokens = []
+    vpointers = []
+    funcs = []
+    testcase = []
+    print("Test...")
+    for filename in os.listdir(realtestpath):
+        if(filename.endswith(".pkl") is False):
+            continue
+        print(filename)
+        f = open(os.path.join(realtestpath,filename),"rb")
+        dataset_file, linetokens_file, vpointers_file, funcs_file, corpus_file, testcase_file = pickle.load(f,encoding = 'iso-8859-1')
+        f.close()
+        dataset += dataset_file
+        linetokens += linetokens_file
+        vpointers += vpointers_file
+        funcs += funcs_file
+        testcase +=testcase_file
+    print(len(dataset),len(testcase))
+
+    labels = []
+    for vp in range(len(vpointers)):
+        if vpointers[vp] != []:
+            label = 1
+        else:
+            label = 0
+        labels.append(label)
+
+    print(Counter(labels))
+
+    test_generator = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
+    all_test_samples = len(dataset)
+    steps_epoch = int(all_test_samples / batch_size)
+
+    get_bgru_output = K.function([model.layers[0].input, K.learning_phase()], [model.layers[7].output])
+
     with open('predictions_{0}_{1}.txt'.format(idlabel,fileLabel),'w') as fw:
         fw.write('filepath,pred,label,tokenIndex(es)\n')
 
-        print("Loading data...")
-        for filename in os.listdir(realtestpath):
-            print(filename)
-            f = open(realtestpath+filename, "rb")
-            realdata = pickle.load(f, encoding="latin1")
-            f.close()
+        for i in range(steps_epoch):
+            test_input = next(test_generator)
+            layer_output = get_bgru_output([test_input[0][0],0])
 
-            dataset, linetokens, vpointers, funcs, corpus_file, testcase = realdata
+            for j in range(batch_size):
+                index = i*batch_size + j
 
-            labels = []
-            for vp in range(len(vpointers)):
-                if vpointers[vp] != []:
-                    label = 1
+                result = sample_threshold_windows(layer_output[0][j], linetokens[index], {'threshold_value':0.5, 'k':1})
+
+                if result:
+                    y_pred = 1
                 else:
-                    label = 0
-                labels.append(label)
+                    y_pred = 0
 
-            batch_size = 1
-            all_samples = len(dataset)
-            steps_epoch = int(all_samples / batch_size)
-            d = generator_of_data(dataset, labels, linetokens, vpointers, batch_size, maxlen, vector_dim)
-
-            pred_labels = model.predict_generator(d, steps=steps_epoch)
-            for i in range(len(pred_labels)):
-                fw.write('{0},{1},{2},{3}\n'.format(testcase[i],pred_labels[i][0],labels[i],vpointers[i]))
+                fw.write('{0},{1},{2},{3}\n'.format(testcase[index],y_pred,labels[index],vpointers[index]))
 
 if __name__ == "__main__":
     idlabel = sys.argv[1]
@@ -482,12 +514,26 @@ if __name__ == "__main__":
     testdataSetPath = "./data_preprocess/data_{0}/dl_input/test/".format(idlabel)
     weightPath = 'model_{0}/bgru_0.4_k=1.h5'.format(idlabel)
     resultPath = "result_{0}/bgru_0.4_k=1.2".format(idlabel)
-#   main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, idlabel, dropout=dropout)
+    # Train model on training dataset
+    start = time.time()
+    main(traindataSetPath, testdataSetPath, weightPath, resultPath, batchSize, maxLen, vectorDim, idlabel, dropout=dropout)
+    sys.stdout.write('Took {0} seconds to train model\n'.format(time.time()-start))
 
-#   traindataSetPath = "./data_preprocess/data_wild/dl_input/train/"
+
+    # Test training dataset
+    start = time.time()
+    testdataSetPath = "./data_preprocess/data_{0}/dl_input/train/".format(idlabel)
+    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'train',idlabel)
+    sys.stdout.write('Took {0} seconds to test training set\n'.format(time.time()-start))
+    # Test testing dataset
+    start = time.time()
+    testdataSetPath = "./data_preprocess/data_{0}/dl_input/test/".format(idlabel)
+    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'test',idlabel)
+    sys.stdout.write('Took {0} seconds to test testing set\n'.format(time.time()-start))
+#   # Test Wild dataset
+#   start = time.time()
+#   testdataSetPath = "./data_preprocess/data_wild/dl_input/train/"
+#   testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'wild_1',idlabel)
 #   testdataSetPath = "./data_preprocess/data_wild/dl_input/test/"
-#   testrealdata(traindataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'wild_1',idlabel)
 #   testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, 'wild_2',idlabel)
-
-    testdataSetPath = "./data_preprocess/data_415/dl_input/test/"
-    testrealdata(testdataSetPath, weightPath, batchSize, maxLen, vectorDim, dropout, '415',idlabel)
+#   sys.stdout.write('Took {0} seconds to test wild set\n'.format(time.time()-start))

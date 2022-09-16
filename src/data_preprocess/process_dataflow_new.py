@@ -36,10 +36,6 @@ def get_sentences(slicepath, labelpath, corpuspath, idlabel):
 
     # Read in vulnerable lines
     for k,v in f2f.items():
-        # Skip files that don't exist yet -- for when I was running this all in parallel
-        if not os.path.exists(v):
-            continue
-
         with open(v,'r') as fr:
             for line in fr:
                 line = line.strip('\n')

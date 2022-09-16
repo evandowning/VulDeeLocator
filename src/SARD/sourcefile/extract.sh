@@ -1,34 +1,35 @@
 #!/bin/bash
 
+set -e
+
 cweRoot="/home/evan/labeled-dataset-master/"
 
-count=1
 
-#TODO
 # For each CWE
 #for id in 415 416 190 121 122; do
 for id in 416; do
-    sardline="SARD-hole_line_${id}.txt"
-    rm $sardline
-
     idRoot="${cweRoot}/CWE${id}/source_files/"
 
+    sardline="SARD-hole_line_${id}.txt"
+    if [ -f $sardline ]; then
+        rm $sardline
+    fi
+
     # For each source file
-    for fn in `find ${idRoot} -type f`; do
-        echo $fn
+    count=1
+    # Takes about 3 minutes for CWE416
+    for fn in `find ${idRoot} -maxdepth 1 -type f \( -name "*.c" -o -name "*.cpp" \)`; do
+       echo "Parsing $fn"
 
         outDir="${fn}_dir/"
         # Clear directory of data (bc,ll,pkl files)
         rm -rf "${outDir}"
         # Create output directory
         mkdir -p "${outDir}"
-        echo $outDir
 
         cweJson="${fn/source_files/source_labels\/individual}.json"
         cweXml="${cweJson/.json/.xml}"
         cweTxt="${cweJson/.json/.txt}"
-        echo $cweJson
-        echo $cweXml
 
         # Create XML file for line labels
         python genxml.py $cweJson $cweXml $fn $count
@@ -41,25 +42,37 @@ for id in 416; do
         count=$((count+1))
     done
 
-    # Parse data
-    ./get-llvmwithline $sardline
+    # Deduplicate SARD file
+    cat ${sardline} | sort | uniq > tmp.txt
+    mv tmp.txt ${sardline}
 
-    idRoot="${cweRoot}/CWE${id}/source_files/"
+    # Parse data
+    # Takes 13 minutes for CWE 416
+    ./get-llvmwithline $sardline &> get-llvmwithline_${id}_stdout_stderr.txt
+
+    if [ -f autoreorder_${id}_stdout.txt ]; then
+        rm autoreorder_${id}_stdout.txt
+    fi
 
     # For each source file
-    for fn in `find ${idRoot} -type f`; do
+    # Takes 31 minutes for CWE 416
+    while read -r line; do
+        fn=`echo $line | cut -d' ' -f1`
+        echo "Extracting $fn"
+
         outDir="${fn}_dir/"
-
         bc="${fn%.*}.bc"
-
-        mv $bc $outDir
-        cp $fn $outDir
-
         cweJson="${fn/source_files/source_labels\/individual}.json"
         cweTxt="${cweJson/.json/.txt}"
 
-        python autoReorder.py $outDir $cweTxt
+        # Clear out files in root of this directory (e.g., in case we re-run this routine while debugging)
+        find "${outDir}" -maxdepth 1 -type f -delete
+
+        cp $bc $outDir
+        cp $fn $outDir
+
+        python autoReorder.py $outDir $cweTxt >> autoreorder_${id}_stdout.txt
 
         python getFlawLoc.py $outDir
-    done
+    done < $sardline
 done

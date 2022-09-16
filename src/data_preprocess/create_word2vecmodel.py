@@ -29,14 +29,19 @@ class DirofCorpus(object):
     
     def __iter__(self):
         print("\nepoch: ", self.iter_num)
+        count = 0
         for d in self.dirname:
             for fn in os.listdir(d):
-                print("\r"+fn, end='')
+                count += 1
+#               print("\r"+fn, end='')
+                sys.stdout.write('{0}\r'.format(count))
+                sys.stdout.flush()
                 for filename in os.listdir(os.path.join(d, fn)):
                     sample = pickle.load(open(os.path.join(d, fn, filename), 'rb'))[0]
                     yield sample
-                    
+
         self.iter_num += 1
+        sys.stdout.write('\n')
 
 '''
 generate_w2vmodel function
@@ -69,10 +74,28 @@ def evaluate_w2vModel(w2vModelPath):
         print(model.most_similar_cosmul(positive=[sign], topn=10))
     
 
+def get_timesteps_values(decTokenFlawPath, threShold):
+    lengths = []
+    for path in decTokenFlawPath:
+        for testcase in os.listdir(path):
+            for filename in os.listdir(os.path.join(path, testcase)):
+                f1 = open(os.path.join(path, testcase, filename), 'rb')
+                lengths.append(len(pickle.load(f1)[0]))
+                f1.close()
+
+    lengths = sorted(lengths)
+    len_list = len(lengths)
+
+    index = int(len_list * threShold)
+    print(index)
+    print(lengths[index])
+
 def main():
     filelabel = sys.argv[1]
     dec_tokenFlaw_path = ['./data_{0}/SARD/corpus/'.format(filelabel)]
+    get_timesteps_values(dec_tokenFlaw_path, 0.95)
 
+    # NOTE: Only train 5 because that's what get_dl_input.py uses
     #for iter in [3, 5, 10, 15]:
     for iter in [5]:
         w2v_model_path = "w2v_model_"+filelabel+"/wordmodel_min_iter"+str(iter)+".model"
