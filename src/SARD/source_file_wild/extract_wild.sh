@@ -27,6 +27,12 @@ while read -r line; do
     bc="${fn%.*}.bc"
     txt="${bc/.bc/.txt}"
 
+    # If we've already processed this file
+    result=`find $outDir -type f -name '*.final.ll'`
+    if [ "$result" != "" ]; then
+        continue
+    fi
+
     echo $fn
     echo $outDir
 #   echo $bc

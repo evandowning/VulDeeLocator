@@ -6,6 +6,9 @@ We extract pieces of source code according to some syntax information (i.e., sou
 
 We prepare a dataset of Lower Level Virtual Machine (LLVM) intermediate code with accompanying program source code from two data sources: the National Vulnerability Database (NVD) and the Software Assurance Reference Dataset (SARD). We collect 15,150 programs, including 2,821 real-world programs and 12,329 synthetic and academic programs. The dataset contains 155,539 vulnerability candidates in intermediate code (i.e., iSeVC), among which 40,382 are vulnerable and 115,157 are not vulnerable. For vulnerable iSeVCs, the line numbers of the vulnerabilities are available.
 
+## NOTE
+  * This a heavily modified fork of VulDeeLocator for [VulChecker](https://github.com/ymirsky/VulChecker)
+
 ## Setup
   * [Install Anaconda](https://www.anaconda.com/products/individual)
   * ```
