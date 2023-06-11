@@ -1,5 +1,8 @@
-# VulDeeLocator: A Deep Learning-Based Fine-Grained Vulnerability Detector
+This master branch is the original VulDeeLocator implementation.
 
+For the modifications for running the VulChecker baseline, see the `develop` branch [here](https://github.com/evandowning/VulDeeLocator/tree/develop)
+
+# VulDeeLocator: A Deep Learning-Based Fine-Grained Vulnerability Detector
 
 We propose Vulnerability Deep learning-based Locator (VulDeeLocator), a deep learning-based fine-grained vulnerability detector, for C/C++ programs with source code. VulDeeLocator advances the state-of-the-art by simultaneously achieving a high detection capability and a high locating precision. The core innovations underlying VulDeeLocator are (i) the leverage of intermediate code to accommodate semantic information that cannot be conveyed by source code-based representation, and (ii) the concept of granularity refinement for precisely pinning down locations of vulnerabilities.
 
